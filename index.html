@@ -86,3 +86,29 @@ Next step: match this to the plumbing permit authority.`;
 
 </body>
 </html>
+<!-- Your HTML content -->
+<input id="address" placeholder="Enter a Wisconsin address" />
+<button onclick="lookup()">Look it up</button>
+<div class="result" id="result"></div>
+
+<!-- Include permit office data first -->
+<script src="permits.js"></script>
+
+<!-- Then include your main lookup script -->
+<script>
+  const API_KEY = "PASTE_YOUR_API_KEY_HERE";
+
+  function findPermitOffice(city, town, county) {
+    let office = permitOffices.find(o => o.type === "city" && o.name.includes(city));
+    if (!office) {
+      office = permitOffices.find(o => o.type === "county" && o.county === county);
+    }
+    return office || null;
+  }
+
+  async function lookup() {
+    // your lookup code here
+  }
+</script>
+
+</body>
