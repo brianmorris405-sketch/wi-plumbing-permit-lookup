@@ -1,114 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Wisconsin Plumbing Permit Lookup</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      max-width: 600px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 16px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f4f4f4;
-      white-space: pre-wrap;
-    }
-  </style>
-</head>
-<body>
-
-  <h2>Wisconsin Plumbing Permit Lookup</h2>
-
-  <input id="address" placeholder="Enter a Wisconsin address" />
-  <button onclick="lookup()">Look it up</button>
-
-  <div class="result" id="result"></div>
-
-<script>
-const API_KEY = "AIzaSyC1IBaXF_wPmi1Vk71XVXzBSFWdS3xUZao";
-
-async function lookup() {
-  const address = document.getElementById("address").value;
-  const resultBox = document.getElementById("result");
-
-  if (!address) {
-    resultBox.textContent = "Enter an address.";
-    return;
-  }
-
-  resultBox.textContent = "Looking up address...";
-
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (!data.results.length) {
-      resultBox.textContent = "Address not found.";
-      return;
-    }
-
-    const components = data.results[0].address_components;
-
-    const get = (type) =>
-      components.find(c => c.types.includes(type))?.long_name || "Not found";
-
-    const city = get("locality");
-    const town = get("administrative_area_level_3");
-    const county = get("administrative_area_level_2").replace(" County", "");
-
-    resultBox.textContent =
-`City: ${city}
-Town: ${town}
-County: ${county}
-
-Next step: match this to the plumbing permit authority.`;
-
-  } catch (err) {
-    resultBox.textContent = "Error looking up address.";
-  }
-}
-</script>
-
-</body>
-</html>
-<!-- Your HTML content -->
-<input id="address" placeholder="Enter a Wisconsin address" />
-<button onclick="lookup()">Look it up</button>
+<!DOCTYPE html><html lang="en"><head>  <meta charset="UTF-8">  <title>Wisconsin Plumbing Permit Lookup</title>  <style>    body {      font-family: Arial, sans-serif;      padding: 40px;      max-width: 700px;    }    input {      width: 100%;      padding: 10px;      font-size: 16px;      margin-bottom: 10px;    }    button {      padding: 10px 16px;      font-size: 16px;      cursor: pointer;    }    .result {      margin-top: 20px;      padding: 15px;      background: #f4f4f4;      white-space: pre-wrap;    }  </style></head><body>
+<script>  // Simple password protection  const password = "plumbing2026"; // Change to your paid-user password  const entered = prompt("Enter password to access the site:");  if (entered !== password) {    document.body.innerHTML = "<h2>Access denied</h2>";    throw "Access denied";  }</script>
+<h2>Wisconsin Plumbing Permit Lookup</h2>
+<input id="address" placeholder="Enter a Wisconsin address" /><button onclick="lookup()">Look it up</button>
 <div class="result" id="result"></div>
-
-<!-- Include permit office data first -->
-<script src="permits.js"></script>
-
-<!-- Then include your main lookup script -->
-<script>
-  const API_KEY = "PASTE_YOUR_API_KEY_HERE";
-
-  function findPermitOffice(city, town, county) {
-    let office = permitOffices.find(o => o.type === "city" && o.name.includes(city));
-    if (!office) {
-      office = permitOffices.find(o => o.type === "county" && o.county === county);
-    }
-    return office || null;
-  }
-
-  async function lookup() {
-    // your lookup code here
-  }
-</script>
-
-</body>
+<!-- Include the permit office data first --><script src="permits.js"></script>
+<!-- Main lookup script --><script>const API_KEY = "AIzaSyC1IBaXF_wPmi1Vk71XVXzBSFWdS3xUZao"; // replace with your Geocoding API key
+// Lookup permit office by city first, then countyfunction findPermitOffice(city, town, county) {  let office = permitOffices.find(o => o.type === "city" && o.name.includes(city));  if (!office) {    office = permitOffices.find(o => o.type === "county" && o.county === county);  }  return office || null;}
+async function lookup() {  const address = document.getElementById("address").value;  const resultBox = document.getElementById("result");
+  if (!address) {    resultBox.textContent = "Enter an address.";    return;  }
+  resultBox.textContent = "Looking up address...";
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`;
+  try {    const res = await fetch(url);    const data = await res.json();
+    if (!data.results.length) {      resultBox.textContent = "Address not found.";      return;    }
+    const components = data.results[0].address_components;    const get = (type) =>      components.find(c => c.types.includes(type))?.long_name || "Not found";
+    const city = get("locality");    const town = get("administrative_area_level_3");    const county = get("administrative_area_level_2").replace(" County", "");
+    resultBox.textContent =`City: ${city}Town: ${town}County: ${county}`;
+    const office = findPermitOffice(city, town, county);
+    if (office) {      resultBox.textContent += `
+Permit Office:Name: ${office.name}Contact: ${office.contact}Phone: ${office.phone}Website: ${office.website}`;    } else {      resultBox.textContent += `
+Permit Office: Not found. Check with local authorities.`;    }
+  } catch (err) {    console.error(err);    resultBox.textContent = "Error looking up address.";  }}</script>
+<p style="font-size:0.9em;color:gray;">This tool helps locate Wisconsin plumbing permit offices. Always confirm requirements directly with the issuing authority. This site is not affiliated with the state government.</p>
+</body></html>
