@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wisconsin Plumbing Permit Lookup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      max-width: 600px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f4f4f4;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Wisconsin Plumbing Permit Lookup</h2>
+
+  <input id="address" placeholder="Enter a Wisconsin address" />
+  <button onclick="lookup()">Look it up</button>
+
+  <div class="result" id="result"></div>
+
+<script>
+const API_KEY = "AIzaSyC1IBaXF_wPmi1Vk71XVXzBSFWdS3xUZao";
+
+async function lookup() {
+  const address = document.getElementById("address").value;
+  const resultBox = document.getElementById("result");
+
+  if (!address) {
+    resultBox.textContent = "Enter an address.";
+    return;
+  }
+
+  resultBox.textContent = "Looking up address...";
+
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.results.length) {
+      resultBox.textContent = "Address not found.";
+      return;
+    }
+
+    const components = data.results[0].address_components;
+
+    const get = (type) =>
+      components.find(c => c.types.includes(type))?.long_name || "Not found";
+
+    const city = get("locality");
+    const town = get("administrative_area_level_3");
+    const county = get("administrative_area_level_2").replace(" County", "");
+
+    resultBox.textContent =
+`City: ${city}
+Town: ${town}
+County: ${county}
+
+Next step: match this to the plumbing permit authority.`;
+
+  } catch (err) {
+    resultBox.textContent = "Error looking up address.";
+  }
+}
+</script>
+
+</body>
+</html>
